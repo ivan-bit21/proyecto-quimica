@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Tabla Periódica Completa - 120 Elementos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(145deg, #0f1724 0%, #1a1a2e 100%);
+            margin: 0;
+            padding: 20px;
+            color: #eee;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(15, 25, 35, 0.7);
+            backdrop-filter: blur(3px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.3rem;
+            margin: 0 0 0.5rem;
+            background: linear-gradient(135deg, #FFD966, #6AB0DE, #FF8C69);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .sub {
+            text-align: center;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        /* Buscador */
+        .search-area {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .search-area input {
+            width: 320px;
+            padding: 14px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 60px;
+            background: #f0f4fa;
+            color: #1e2a3a;
+            font-weight: 500;
+            outline: none;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .search-area input:focus {
+            transform: scale(1.01);
+            background: #fff;
+            box-shadow: 0 0 0 3px #6AB0DE;
+        }
+
+        .search-area button {
+            background: #2c5f8a;
+            border: none;
+            padding: 0 28px;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .search-area button:hover {
+            background: #1e4a6e;
+            transform: translateY(-2px);
+        }
+
+        /* Panel de información */
+        .info-panel {
+            background: #0b1620dd;
+            backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 1.2rem 2rem;
+            margin-bottom: 2rem;
+            border-left: 8px solid #FFD966;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .info-panel h2 {
+            margin: 0 0 0.5rem 0;
+            color: #FFD966;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .info-card {
+            background: #1e2a36;
+            border-radius: 1rem;
+            padding: 8px 14px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #8ab3cf;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        /* Tabla periódica (grid) */
+        .periodic-table {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .pt-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(70px, 80px));
+            gap: 5px;
+            justify-content: center;
+            background: transparent;
+            padding-bottom: 20px;
+        }
+
+        .element-card {
+            background: #1f2c38cc;
+            backdrop-filter: blur(4px);
+            border-radius: 10px;
+            padding: 6px 3px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid #3e5568;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .element-card:hover {
+            transform: scale(1.03);
+            background: #2c4050;
+            border-color: #FFD966;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .element-symbol {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #FFE5B4;
+        }
+
+        .element-number {
+            font-size: 0.65rem;
+            color: #9bb7d0;
+        }
+
+        .element-name {
+            font-size: 0.6rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #cbdbe6;
+        }
+
+        .element-mass {
+            font-size: 0.55rem;
+            color: #a8c0d8;
+        }
+
+        /* Colores por categoría (borde superior) */
+        .nonmetal { border-top: 3px solid #6fbf73; }
+        .noble-gas { border-top: 3px solid #b0d9ff; }
+        .alkali-metal { border-top: 3px solid #ffa270; }
+        .alkaline-earth { border-top: 3px solid #f7d44a; }
+        .transition { border-top: 3px solid #e8a87c; }
+        .lanthanide { border-top: 3px solid #b39cd0; }
+        .actinide { border-top: 3px solid #ff8c94; }
+        .post-transition { border-top: 3px solid #80b3b3; }
+        .metalloid { border-top: 3px solid #b3cc57; }
+        .halogen { border-top: 3px solid #ff9f4a; }
+
+        @media (max-width: 1100px) {
+            .pt-grid {
+                grid-template-columns: repeat(18, minmax(60px, 68px));
+            }
+            .element-symbol { font-size: 1rem; }
+            .element-name { font-size: 0.55rem; white-space: normal; word-break: break-word; }
+        }
+        @media (max-width: 800px) {
+            .pt-grid {
+                grid-template-columns: repeat(18, minmax(48px, 55px));
+            }
+            .element-symbol { font-size: 0.85rem; }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>⚛️ TABLA PERIÓDICA - 120 ELEMENTOS</h1>
+    <div class="sub">Todos los elementos hasta Z=120 · Busca por nombre, símbolo o número atómico</div>
+
+    <div class="search-area">
+        <input type="text" id="searchInput" placeholder="Ej: Oro, H, 79, Oxígeno...">
+        <button id="searchBtn">🔍 Buscar</button>
+    </div>
+
+    <div class="info-panel" id="infoPanel">
+        <h2>📊 Información del Elemento <span id="infoTitle">Selecciona uno</span></h2>
+        <div class="info-grid" id="infoGrid"></div>
+    </div>
+
+    <div class="periodic-table">
+        <div id="periodicGrid" class="pt-grid"></div>
+    </div>
+    <footer>Haz clic en cualquier elemento para ver sus datos | Datos completos de los 120 elementos</footer>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // DATOS COMPLETOS DE 120 ELEMENTOS (Z=1 a Z=120)
+    // Cada elemento: z, símbolo, nombre, masa, grupo, periodo, categoría, configuración (balanza)
+    // --------------------------------------------------------------
+    const elementosData = [
+        // Periodo 1
+        {z:1, sym:"H", nom:"Hidrógeno", mass:1.008, group:1, period:1, cat:"No metal", config:"1s¹"},
+        {z:2, sym:"He", nom:"Helio", mass:4.0026, group:18, period:1, cat:"Gas noble", config:"1s²"},
+        // Periodo 2
+        {z:3, sym:"Li", nom:"Litio", mass:6.94, group:1, period:2, cat:"Metal alcalino", config:"[He] 2s¹"},
+        {z:4, sym:"Be", nom:"Berilio", mass:9.0122, group:2, period:2, cat:"Metal alcalinotérreo", config:"[He] 2s²"},
+        {z:5, sym:"B", nom:"Boro", mass:10.81, group:13, period:2, cat:"Metaloide", config:"[He] 2s² 2p¹"},
+        {z:6, sym:"C", nom:"Carbono", mass:12.011, group:14, period:2, cat:"No metal", config:"[He] 2s² 2p²"},
+        {z:7, sym:"N", nom:"Nitrógeno", mass:14.007, group:15, period:2, cat:"No metal", config:"[He] 2s² 2p³"},
+        {z:8, sym:"O", nom:"Oxígeno", mass:15.999, group:16, period:2, cat:"No metal", config:"[He] 2s² 2p⁴"},
+        {z:9, sym:"F", nom:"Flúor", mass:18.998, group:17, period:2, cat:"Halógeno", config:"[He] 2s² 2p⁵"},
+        {z:10, sym:"Ne", nom:"Neón", mass:20.18, group:18, period:2, cat:"Gas noble", config:"[He] 2s² 2p⁶"},
+        // Periodo 3
+        {z:11, sym:"Na", nom:"Sodio", mass:22.99, group:1, period:3, cat:"Metal alcalino", config:"[Ne] 3s¹"},
+        {z:12, sym:"Mg", nom:"Magnesio", mass:24.305, group:2, period:3, cat:"Metal alcalinotérreo", config:"[Ne] 3s²"},
+        {z:13, sym:"Al", nom:"Aluminio", mass:26.982, group:13, period:3, cat:"Metal post-transición", config:"[Ne] 3s² 3p¹"},
+        {z:14, sym:"Si", nom:"Silicio", mass:28.086, group:14, period:3, cat:"Metaloide", config:"[Ne] 3s² 3p²"},
+        {z:15, sym:"P", nom:"Fósforo", mass:30.974, group:15, period:3, cat:"No metal", config:"[Ne] 3s² 3p³"},
+        {z:16, sym:"S", nom:"Azufre", mass:32.06, group:16, period:3, cat:"No metal", config:"[Ne] 3s² 3p⁴"},
+        {z:17, sym:"Cl", nom:"Cloro", mass:35.45, group:17, period:3, cat:"Halógeno", config:"[Ne] 3s² 3p⁵"},
+        {z:18, sym:"Ar", nom:"Argón", mass:39.95, group:18, period:3, cat:"Gas noble", config:"[Ne] 3s² 3p⁶"},
+        // Periodo 4
+        {z:19, sym:"K", nom:"Potasio", mass:39.098, group:1, period:4, cat:"Metal alcalino", config:"[Ar] 4s¹"},
+        {z:20, sym:"Ca", nom:"Calcio", mass:40.078, group:2, period:4, cat:"Metal alcalinotérreo", config:"[Ar] 4s²"},
+        {z:21, sym:"Sc", nom:"Escandio", mass:44.956, group:3, period:4, cat:"Metal de transición", config:"[Ar] 3d¹ 4s²"},
+        {z:22, sym:"Ti", nom:"Titanio", mass:47.867, group:4, period:4, cat:"Metal de transición", config:"[Ar] 3d² 4s²"},
+        {z:23, sym:"V", nom:"Vanadio", mass:50.942, group:5, period:4, cat:"Metal de transición", config:"[Ar] 3d³ 4s²"},
+        {z:24, sym:"Cr", nom:"Cromo", mass:51.996, group:6, period:4, cat:"Metal de transición", config:"[Ar] 3d⁵ 4s¹"},
+        {z:25, sym:"Mn", nom:"Manganeso", mass:54.938, group:7, period:4, cat:"Metal de transición", config:"[Ar] 3d⁵ 4s²"},
+        {z:26, sym:"Fe", nom:"Hierro", mass:55.845, group:8, period:4, cat:"Metal de transición", config:"[Ar] 3d⁶ 4s²"},
+        {z:27, sym:"Co", nom:"Cobalto", mass:58.933, group:9, period:4, cat:"Metal de transición", config:"[Ar] 3d⁷ 4s²"},
+        {z:28, sym:"Ni", nom:"Níquel", mass:58.693, group:10, period:4, cat:"Metal de transición", config:"[Ar] 3d⁸ 4s²"},
+        {z:29, sym:"Cu", nom:"Cobre", mass:63.546, group:11, period:4, cat:"Metal de transición", config:"[Ar] 3d¹⁰ 4s¹"},
+        {z:30, sym:"Zn", nom:"Zinc", mass:65.38, group:12, period:4, cat:"Metal post-transición", config:"[Ar] 3d¹⁰ 4s²"},
+        {z:31, sym:"Ga", nom:"Galio", mass:69.723, group:13, period:4, cat:"Metal post-transición", config:"[Ar] 3d¹⁰ 4s² 4p¹"},
+        {z:32, sym:"Ge", nom:"Germanio", mass:72.63, group:14, period:4, cat:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p²"},
+        {z:33, sym:"As", nom:"Arsénico", mass:74.922, group:15, period:4, cat:"Metaloide", config:"[Ar] 3d¹⁰ 4s² 4p³"},
+        {z:34, sym:"Se", nom:"Selenio", mass:78.971, group:16, period:4, cat:"No metal", config:"[Ar] 3d¹⁰ 4s² 4p⁴"},
+        {z:35, sym:"Br", nom:"Bromo", mass:79.904, group:17, period:4, cat:"Halógeno", config:"[Ar] 3d¹⁰ 4s² 4p⁵"},
+        {z:36, sym:"Kr", nom:"Kriptón", mass:83.798, group:18, period:4, cat:"Gas noble", config:"[Ar] 3d¹⁰ 4s² 4p⁶"},
+        // Periodo 5
+        {z:37, sym:"Rb", nom:"Rubidio", mass:85.468, group:1, period:5, cat:"Metal alcalino", config:"[Kr] 5s¹"},
+        {z:38, sym:"Sr", nom:"Estroncio", mass:87.62, group:2, period:5, cat:"Metal alcalinotérreo", config:"[Kr] 5s²"},
+        {z:39, sym:"Y", nom:"Itrio", mass:88.906, group:3, period:5, cat:"Metal de transición", config:"[Kr] 4d¹ 5s²"},
+        {z:40, sym:"Zr", nom:"Circonio", mass:91.224, group:4, period:5, cat:"Metal de transición", config:"[Kr] 4d² 5s²"},
+        {z:41, sym:"Nb", nom:"Niobio", mass:92.906, group:5, period:5, cat:"Metal de transición", config:"[Kr] 4d⁴ 5s¹"},
+        {z:42, sym:"Mo", nom:"Molibdeno", mass:95.95, group:6, period:5, cat:"Metal de transición", config:"[Kr] 4d⁵ 5s¹"},
+        {z:43, sym:"Tc", nom:"Tecnecio", mass:98.0, group:7, period:5, cat:"Metal de transición", config:"[Kr] 4d⁵ 5s²"},
+        {z:44, sym:"Ru", nom:"Rutenio", mass:101.07, group:8, period:5, cat:"Metal de transición", config:"[Kr] 4d⁷ 5s¹"},
+        {z:45, sym:"Rh", nom:"Rodio", mass:102.91, group:9, period:5, cat:"Metal de transición", config:"[Kr] 4d⁸ 5s¹"},
+        {z:46, sym:"Pd", nom:"Paladio", mass:106.42, group:10, period:5, cat:"Metal de transición", config:"[Kr] 4d¹⁰"},
+        {z:47, sym:"Ag", nom:"Plata", mass:107.87, group:11, period:5, cat:"Metal de transición", config:"[Kr] 4d¹⁰ 5s¹"},
+        {z:48, sym:"Cd", nom:"Cadmio", mass:112.41, group:12, period:5, cat:"Metal post-transición", config:"[Kr] 4d¹⁰ 5s²"},
+        {z:49, sym:"In", nom:"Indio", mass:114.82, group:13, period:5, cat:"Metal post-transición", config:"[Kr] 4d¹⁰ 5s² 5p¹"},
+        {z:50, sym:"Sn", nom:"Estaño", mass:118.71, group:14, period:5, cat:"Metal post-transición", config:"[Kr] 4d¹⁰ 5s² 5p²"},
+        {z:51, sym:"Sb", nom:"Antimonio", mass:121.76, group:15, period:5, cat:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p³"},
+        {z:52, sym:"Te", nom:"Telurio", mass:127.6, group:16, period:5, cat:"Metaloide", config:"[Kr] 4d¹⁰ 5s² 5p⁴"},
+        {z:53, sym:"I", nom:"Yodo", mass:126.9, group:17, period:5, cat:"Halógeno", config:"[Kr] 4d¹⁰ 5s² 5p⁵"},
+        {z:54, sym:"Xe", nom:"Xenón", mass:131.29, group:18, period:5, cat:"Gas noble", config:"[Kr] 4d¹⁰ 5s² 5p⁶"},
+        // Periodo 6 (incluye lantánidos)
+        {z:55, sym:"Cs", nom:"Cesio", mass:132.91, group:1, period:6, cat:"Metal alcalino", config:"[Xe] 6s¹"},
+        {z:56, sym:"Ba", nom:"Bario", mass:137.33, group:2, period:6, cat:"Metal alcalinotérreo", config:"[Xe] 6s²"},
+        {z:57, sym:"La", nom:"Lantano", mass:138.91, group:3, period:6, cat:"Lantánido", config:"[Xe] 5d¹ 6s²"},
+        {z:58, sym:"Ce", nom:"Cerio", mass:140.12, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f¹ 5d¹ 6s²"},
+        {z:59, sym:"Pr", nom:"Praseodimio", mass:140.91, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f³ 6s²"},
+        {z:60, sym:"Nd", nom:"Neodimio", mass:144.24, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f⁴ 6s²"},
+        {z:61, sym:"Pm", nom:"Prometio", mass:145.0, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f⁵ 6s²"},
+        {z:62, sym:"Sm", nom:"Samario", mass:150.36, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f⁶ 6s²"},
+        {z:63, sym:"Eu", nom:"Europio", mass:151.96, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f⁷ 6s²"},
+        {z:64, sym:"Gd", nom:"Gadolinio", mass:157.25, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f⁷ 5d¹ 6s²"},
+        {z:65, sym:"Tb", nom:"Terbio", mass:158.93, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f⁹ 6s²"},
+        {z:66, sym:"Dy", nom:"Disprosio", mass:162.5, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f¹⁰ 6s²"},
+        {z:67, sym:"Ho", nom:"Holmio", mass:164.93, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f¹¹ 6s²"},
+        {z:68, sym:"Er", nom:"Erbio", mass:167.26, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f¹² 6s²"},
+        {z:69, sym:"Tm", nom:"Tulio", mass:168.93, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f¹³ 6s²"},
+        {z:70, sym:"Yb", nom:"Iterbio", mass:173.05, group:101, period:6, cat:"Lantánido", config:"[Xe] 4f¹⁴ 6s²"},
+        {z:71, sym:"Lu", nom:"Lutecio", mass:174.97, group:3, period:6, cat:"Lantánido", config:"[Xe] 4f¹⁴ 5d¹ 6s²"},
+        {z:72, sym:"Hf", nom:"Hafnio", mass:178.49, group:4, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d² 6s²"},
+        {z:73, sym:"Ta", nom:"Tantalio", mass:180.95, group:5, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d³ 6s²"},
+        {z:74, sym:"W", nom:"Wolframio", mass:183.84, group:6, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁴ 6s²"},
+        {z:75, sym:"Re", nom:"Renio", mass:186.21, group:7, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁵ 6s²"},
+        {z:76, sym:"Os", nom:"Osmio", mass:190.23, group:8, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁶ 6s²"},
+        {z:77, sym:"Ir", nom:"Iridio", mass:192.22, group:9, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁷ 6s²"},
+        {z:78, sym:"Pt", nom:"Platino", mass:195.08, group:10, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d⁹ 6s¹"},
+        {z:79, sym:"Au", nom:"Oro", mass:196.97, group:11, period:6, cat:"Metal de transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹"},
+        {z:80, sym:"Hg", nom:"Mercurio", mass:200.59, group:12, period:6, cat:"Metal post-transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s²"},
+        {z:81, sym:"Tl", nom:"Talio", mass:204.38, group:13, period:6, cat:"Metal post-transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹"},
+        {z:82, sym:"Pb", nom:"Plomo", mass:207.2, group:14, period:6, cat:"Metal post-transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²"},
+        {z:83, sym:"Bi", nom:"Bismuto", mass:208.98, group:15, period:6, cat:"Metal post-transición", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³"},
+        {z:84, sym:"Po", nom:"Polonio", mass:209.0, group:16, period:6, cat:"Metaloide", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴"},
+        {z:85, sym:"At", nom:"Astato", mass:210.0, group:17, period:6, cat:"Halógeno", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵"},
+        {z:86, sym:"Rn", nom:"Radón", mass:222.0, group:18, period:6, cat:"Gas noble", config:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶"},
+        // Periodo 7 (actínidos)
+        {z:87, sym:"Fr", nom:"Francio", mass:223.0, group:1, period:7, cat:"Metal alcalino", config:"[Rn] 7s¹"},
+        {z:88, sym:"Ra", nom:"Radio", mass:226.0, group:2, period:7, cat:"Metal alcalinotérreo", config:"[Rn] 7s²"},
+        {z:89, sym:"Ac", nom:"Actinio", mass:227.0, group:3, period:7, cat:"Actínido", config:"[Rn] 6d¹ 7s²"},
+        {z:90, sym:"Th", nom:"Torio", mass:232.04, group:102, period:7, cat:"Actínido", config:"[Rn] 6d² 7s²"},
+        {z:91, sym:"Pa", nom:"Protactinio", mass:231.04, group:102, period:7, cat:"Actínido", config:"[Rn] 5f² 6d¹ 7s²"},
+        {z:92, sym:"U", nom:"Uranio", mass:238.03, group:102, period:7, cat:"Actínido", config:"[Rn] 5f³ 6d¹ 7s²"},
+        {z:93, sym:"Np", nom:"Neptunio", mass:237.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f⁴ 6d¹ 7s²"},
+        {z:94, sym:"Pu", nom:"Plutonio", mass:244.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f⁶ 7s²"},
+        {z:95, sym:"Am", nom:"Americio", mass:243.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f⁷ 7s²"},
+        {z:96, sym:"Cm", nom:"Curio", mass:247.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f⁷ 6d¹ 7s²"},
+        {z:97, sym:"Bk", nom:"Berkelio", mass:247.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f⁹ 7s²"},
+        {z:98, sym:"Cf", nom:"Californio", mass:251.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f¹⁰ 7s²"},
+        {z:99, sym:"Es", nom:"Einstenio", mass:252.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f¹¹ 7s²"},
+        {z:100, sym:"Fm", nom:"Fermio", mass:257.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f¹² 7s²"},
+        {z:101, sym:"Md", nom:"Mendelevio", mass:258.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f¹³ 7s²"},
+        {z:102, sym:"No", nom:"Nobelio", mass:259.0, group:102, period:7, cat:"Actínido", config:"[Rn] 5f¹⁴ 7s²"},
+        {z:103, sym:"Lr", nom:"Lawrencio", mass:266.0, group:3, period:7, cat:"Actínido", config:"[Rn] 5f¹⁴ 7s² 7p¹"},
+        {z:104, sym:"Rf", nom:"Rutherfordio", mass:267.0, group:4, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d² 7s²"},
+        {z:105, sym:"Db", nom:"Dubnio", mass:268.0, group:5, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d³ 7s²"},
+        {z:106, sym:"Sg", nom:"Seaborgio", mass:269.0, group:6, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁴ 7s²"},
+        {z:107, sym:"Bh", nom:"Bohrio", mass:270.0, group:7, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁵ 7s²"},
+        {z:108, sym:"Hs", nom:"Hasio", mass:277.0, group:8, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁶ 7s²"},
+        {z:109, sym:"Mt", nom:"Meitnerio", mass:278.0, group:9, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁷ 7s²"},
+        {z:110, sym:"Ds", nom:"Darmstatio", mass:281.0, group:10, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁸ 7s²"},
+        {z:111, sym:"Rg", nom:"Roentgenio", mass:282.0, group:11, period:7, cat:"Metal de transición", config:"[Rn] 5f¹⁴ 6d⁹ 7s²"},
+        {z:112, sym:"Cn", nom:"Copernicio", mass:285.0, group:12, period:7, cat:"Metal post-transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s²"},
+        {z:113, sym:"Nh", nom:"Nihonio", mass:286.0, group:13, period:7, cat:"Metal post-transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹"},
+        {z:114, sym:"Fl", nom:"Flerovio", mass:289.0, group:14, period:7, cat:"Metal post-transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²"},
+        {z:115, sym:"Mc", nom:"Moscovio", mass:290.0, group:15, period:7, cat:"Metal post-transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³"},
+        {z:116, sym:"Lv", nom:"Livermorio", mass:293.0, group:16, period:7, cat:"Metal post-transición", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴"},
+        {z:117, sym:"Ts", nom:"Teneso", mass:294.0, group:17, period:7, cat:"Halógeno", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵"},
+        {z:118, sym:"Og", nom:"Oganesón", mass:294.0, group:18, period:7, cat:"Gas noble", config:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶"},
+        // Elementos 119 y 120 (teóricos)
+        {z:119, sym:"Uue", nom:"Ununennio", mass:316.0, group:1, period:8, cat:"Metal alcalino (teórico)", config:"[Og] 8s¹"},
+        {z:120, sym:"Ubn", nom:"Unbinilio", mass:320.0, group:2, period:8, cat:"Metal alcalinotérreo (teórico)", config:"[Og] 8s²"}
+    ];
+
+    // Función para mostrar la información detallada del elemento
+    function mostrarInfo(elem) {
+        const infoGrid = document.getElementById('infoGrid');
+        const titleSpan = document.getElementById('infoTitle');
+        titleSpan.innerHTML = `⚛️ ${elem.sym} - ${elem.nom} (Z=${elem.z})`;
+        
+        infoGrid.innerHTML = `
+            <div class="info-card"><div class="info-label">Símbolo</div><div class="info-value">${elem.sym}</div></div>
+            <div class="info-card"><div class="info-label">Nombre</div><div class="info-value">${elem.nom}</div></div>
+            <div class="info-card"><div class="info-label">Número Atómico</div><div class="info-value">${elem.z}</div></div>
+            <div class="info-card"><div class="info-label">Balanza (Config. electrónica)</div><div class="info-value">${elem.config}</div></div>
+            <div class="info-card"><div class="info-label">Masa Atómica (u)</div><div class="info-value">${elem.mass}</div></div>
+            <div class="info-card"><div class="info-label">Grupo / Periodo</div><div class="info-value">${elem.group} / ${elem.period}</div></div>
+            <div class="info-card"><div class="info-label">Categoría</div><div class="info-value">${elem.cat}</div></div>
+        `;
+    }
+
+    // Búsqueda por nombre, símbolo o número
+    function buscarElemento() {
+        let query = document.getElementById('searchInput').value.trim().toLowerCase();
+        if (query === "") return;
+        let encontrado = elementosData.find(el => 
+            el.nom.toLowerCase() === query || 
+            el.sym.toLowerCase() === query || 
+            el.z.toString() === query ||
+            el.nom.toLowerCase().includes(query) ||
+            el.sym.toLowerCase().includes(query)
+        );
+        if (encontrado) {
+            mostrarInfo(encontrado);
+            document.getElementById('infoPanel').scrollIntoView({ behavior: "smooth", block: "start" });
+        } else {
+            alert(`❌ Elemento "${query}" no encontrado. Revisa el nombre o símbolo.`);
+        }
+    }
+
+    // Renderizar la tabla periódica (grid por periodo y grupo)
+    function renderTabla() {
+        // Crear matriz de 10 filas (periodos 1-8) y 19 columnas (grupos 1-18)
+        let matrix = Array(10).fill().map(() => Array(19).fill(null));
+        for (let el of elementosData) {
+            let p = el.period;
+            let g = el.group;
+            if (p >= 1 && p <= 8 && g >= 1 && g <= 18) {
+                matrix[p][g] = el;
+            }
+        }
+        const grid = document.getElementById('periodicGrid');
+        grid.innerHTML = '';
+        // Mostrar periodos del 1 al 8
+        for (let p = 1; p <= 8; p++) {
+            for (let g = 1; g <= 18; g++) {
+                let elem = matrix[p][g];
+                if (elem) {
+                    let card = document.createElement('div');
+                    // Asignar clase CSS según categoría para el borde
+                    let catClass = "";
+                    if (elem.cat.includes("alcalino") && !elem.cat.includes("alcalinotérreo")) catClass = "alkali-metal";
+                    else if (elem.cat.includes("alcalinotérreo")) catClass = "alkaline-earth";
+                    else if (elem.cat.includes("transición")) catClass = "transition";
+                    else if (elem.cat.includes("Gas noble")) catClass = "noble-gas";
+                    else if (elem.cat.includes("Halógeno")) catClass = "halogen";
+                    else if (elem.cat.includes("Metaloide")) catClass = "metalloid";
+                    else if (elem.cat.includes("No metal")) catClass = "nonmetal";
+                    else if (elem.cat.includes("Lantánido") || elem.cat.includes("Actínido")) catClass = elem.cat.includes("Lantánido") ? "lanthanide" : "actinide";
+                    else catClass = "post-transition";
+                    card.className = `element-card ${catClass}`;
+                    card.innerHTML = `
+                        <div class="element-number">${elem.z}</div>
+                        <div class="element-symbol">${elem.sym}</div>
+                        <div class="element-name">${elem.nom}</div>
+                        <div class="element-mass">${elem.mass}</div>
+                    `;
+                    card.addEventListener('click', () => mostrarInfo(elem));
+                    grid.appendChild(card);
+                } else {
+                    let emptyDiv = document.createElement('div');
+                    emptyDiv.style.background = "transparent";
+                    emptyDiv.style.border = "none";
+                    grid.appendChild(emptyDiv);
+                }
+            }
+        }
+    }
+
+    // Inicializar eventos y renderizar
+    document.getElementById('searchBtn').addEventListener('click', buscarElemento);
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') buscarElemento();
+    });
+    renderTabla();
+    // Mostrar información del primer elemento por defecto (Hidrógeno)
+    mostrarInfo(elementosData[0]);
+</script>
+</body>
+</html>
